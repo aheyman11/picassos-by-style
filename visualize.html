@@ -1,6 +1,7 @@
 <html>
 
 <head>
+<meta charset="UTF-8" />
 <script type="text/javascript" src="Chart.min.js"></script>
 <script type="text/javascript" src="plot_data.js"></script>
 <script type="text/javascript" src="colormap.js"></script>
@@ -16,35 +17,42 @@
 	<script type="text/javascript">
 		var min_year = 0
 		var max_year = 0
-		colormap = hot
-		num_colors = colormap.length / 3
+		var colormap = hot
+		var num_colors = colormap.length / 3
+      var new_data = null 
+      var new_ids = null
+
 		function transformData(data) {
 			min_year = Math.min.apply(null, data['years'])
 			max_year = Math.max.apply(null, data['years'])
 			new_data = []
+			new_ids = []
 			for (var i = min_year; i <= max_year; i++) {
 				color_index = Math.floor((i - min_year) * ((num_colors - 1) / (max_year - min_year)))
 				r = Math.floor(colormap[3*color_index] * 255)
 				g = Math.floor(colormap[3*color_index + 1] * 255)
 				b = Math.floor(colormap[3*color_index + 2] * 255)
 				new_data.push({label: i, data: [], backgroundColor: 'rgba(' + r + ',' + g + ',' + b + ',64)'})
+            new_ids.push([])
 			}
 			x = data['x']
 			y = data['y']
 			years = data['years']
 			for (var i = 0; i < data['x'].length; i++) {
-				new_data[years[i] - min_year].data.push({x: x[i], y: y[i], r: 5})
+            var idx = years[i] - min_year
+				new_data[idx].data.push({x: x[i], y: y[i], r: 5})
+				new_ids[idx].push(data['ids'][i])
 			}
-			return new_data
 		}
 
 		window.onload = function() {
 			var chartCanvas = document.getElementById("myChart")
 			var ctx = chartCanvas.getContext('2d');
+         transformData(data)
 			window.myChart = new Chart(ctx, {
 			    type: 'bubble',
 			    data: {
-			        datasets: transformData(data)
+			        datasets: new_data
 			    },
 			    options: {
 			    	scales: {
@@ -64,8 +72,12 @@
 			chartCanvas.onclick = function(evt){
 				var img_ctx = document.getElementById("myImage").getContext('2d');
 		    	var activePoint = myChart.getElementAtEvent(evt);
+            if (activePoint.length === 0) return;
 		    	// => activePoint is a point on the canvas that is at the same position as the click event.
-		    	filename = data['ids'][activePoint[0]._index] + '.jpg'
+
+            var datasetIdx = activePoint[0]._datasetIndex;
+            var paintingIdx = activePoint[0]._index;
+		    	filename = new_ids[datasetIdx][paintingIdx] + '.jpg'
 		    	img_object = new Image();
 		    	img_object.onload = function(){
 		    		console.log("img loaded")
