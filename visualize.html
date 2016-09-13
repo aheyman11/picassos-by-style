@@ -11,9 +11,6 @@
 }
 #myImage {
    position: absolute;
-   float: right;
-   display: inline-block;
-   overflow: hidden;
 }
 </style>
 <script type="text/javascript" src="Chart.min.js"></script>
@@ -99,6 +96,7 @@
 		    	img_object.onload = function(){
                canvas.height = thumbnailHeight;                
                canvas.width = thumbnailHeight*(img_object.width/img_object.height);
+               canvas.style.left = window.innerWidth - canvas.width - 10;
 		    		console.log("img loaded "+ canvas.width+" "+ canvas.height)
 		    		img_ctx.drawImage(img_object, 0, 0, canvas.width, canvas.height);       
 		    	}
