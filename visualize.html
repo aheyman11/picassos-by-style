@@ -3,6 +3,7 @@
 <head>
 <script type="text/javascript" src="Chart.min.js"></script>
 <script type="text/javascript" src="plot_data.js"></script>
+<script type="text/javascript" src="colormap.js"></script>
 <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script> -->
 </head>
 
@@ -13,12 +14,26 @@
 	<canvas id="myImage" height="256" width="256"></canvas>
 
 	<script type="text/javascript">
+		var min_year = 0
+		var max_year = 0
+		colormap = hot
+		num_colors = colormap.length / 3
 		function transformData(data) {
+			min_year = Math.min.apply(null, data['years'])
+			max_year = Math.max.apply(null, data['years'])
 			new_data = []
+			for (var i = min_year; i <= max_year; i++) {
+				color_index = Math.floor((i - min_year) * ((num_colors - 1) / (max_year - min_year)))
+				r = Math.floor(colormap[3*color_index] * 255)
+				g = Math.floor(colormap[3*color_index + 1] * 255)
+				b = Math.floor(colormap[3*color_index + 2] * 255)
+				new_data.push({label: i, data: [], backgroundColor: 'rgba(' + r + ',' + g + ',' + b + ',64)'})
+			}
 			x = data['x']
 			y = data['y']
-			for (var i = 0; i < x.length; i++) {
-				new_data.push({x: x[i], y: y[i], r: 5})
+			years = data['years']
+			for (var i = 0; i < data['x'].length; i++) {
+				new_data[years[i] - min_year].data.push({x: x[i], y: y[i], r: 5})
 			}
 			return new_data
 		}
@@ -29,10 +44,20 @@
 			window.myChart = new Chart(ctx, {
 			    type: 'bubble',
 			    data: {
-			        datasets: [{
-			        	label: "picassos",
-			            data: transformData(data)
-			        }]
+			        datasets: transformData(data)
+			    },
+			    options: {
+			    	scales: {
+            			xAxes: [{
+               				ticks: { display: false}
+            			}],
+            			yAxes: [{
+               				ticks: { display: false}
+            			}]
+        			},
+        			legend: {
+        				display: false
+        			}
 			    }
 			});
 
