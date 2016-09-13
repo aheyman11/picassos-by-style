@@ -2,6 +2,20 @@
 
 <head>
 <meta charset="UTF-8" />
+<style>
+.container {
+   position: relative;
+   width:75%;
+   display: inline-block;
+   overflow: hidden;
+}
+#myImage {
+   position: absolute;
+   float: right;
+   display: inline-block;
+   overflow: hidden;
+}
+</style>
 <script type="text/javascript" src="Chart.min.js"></script>
 <script type="text/javascript" src="plot_data.js"></script>
 <script type="text/javascript" src="colormap.js"></script>
@@ -9,10 +23,10 @@
 </head>
 
 <body>
-	<div style="width:75%;">
+	<div class="container">
         <canvas id="myChart"></canvas>
     </div>
-	<canvas id="myImage" height="256" width="256"></canvas>
+	<canvas id="myImage" ></canvas>
 
 	<script type="text/javascript">
 		var min_year = 0
@@ -21,6 +35,7 @@
 		var num_colors = colormap.length / 3
       var new_data = null 
       var new_ids = null
+      var thumbnailHeight = 256
 
 		function transformData(data) {
 			min_year = Math.min.apply(null, data['years'])
@@ -75,13 +90,17 @@
             if (activePoint.length === 0) return;
 		    	// => activePoint is a point on the canvas that is at the same position as the click event.
 
+            var canvas = document.getElementById("myImage");
+            
             var datasetIdx = activePoint[0]._datasetIndex;
             var paintingIdx = activePoint[0]._index;
 		    	filename = new_ids[datasetIdx][paintingIdx] + '.jpg'
 		    	img_object = new Image();
 		    	img_object.onload = function(){
-		    		console.log("img loaded")
-		    		img_ctx.drawImage(img_object, 0, 0, 256, 256);
+               canvas.height = thumbnailHeight;                
+               canvas.width = thumbnailHeight*(img_object.width/img_object.height);
+		    		console.log("img loaded "+ canvas.width+" "+ canvas.height)
+		    		img_ctx.drawImage(img_object, 0, 0, canvas.width, canvas.height);       
 		    	}
 		    	img_object.src = './picasso/' + filename
 			};
