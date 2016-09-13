@@ -3,55 +3,53 @@
 <head>
 <script type="text/javascript" src="Chart.min.js"></script>
 <script type="text/javascript" src="plot_data.js"></script>
- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-<script type="text/javascript">
-
-function transformData(data) {
-	new_data = []
-	x = data['x']
-	y = data['y']
-	for (var i = 0; i < x.length; i++) {
-		new_data.push({x: x[i], y: y[i], r: 10})
-	}
-	return new_data
-}
-
-function chartInit() {
-	console.log("hi");
-
-	chart_data = transformData(data)
-
-	var ctx = document.getElementById("myChart");
-	var myChart = new Chart(ctx, {
-	    type: 'bubble',
-	    data: {
-	        datasets: [{
-	        	label: "picassos",
-	            data: chart_data
-	        }]
-	    }
-	});
-
-	ctx.onclick = function(evt){
-		var img_ctx = document.getElementById("myImage").getContext('2d');
-    	var activePoints = myChart.getElementsAtEvent(evt);
-    	// => activePoints is an array of points on the canvas that are at the same position as the click event.
-    	filename = data['ids'][activePoints[0]._index] + '.jpg'
-    	img_object = new Image();
-    	img_object.src = './picasso/' + filename
-    	// img_object.src = 'http://localhost:8080/' + filename
-    	img_object.onload = function(){
-    		console.log("img loaded")
-    		img_ctx.drawImage(img_object, 0, 0, 256, 256);
-    	}
-	};
-}
-</script>
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script> -->
 </head>
 
-<body onload="chartInit();">
-	<canvas id="myChart" width="256" height="256"></canvas>
-	<canvas id="myImage" width="256" height="256"></canvas>
-</body
+<body>
+	<div style="width:75%;">
+        <canvas id="myChart"></canvas>
+    </div>
+	<canvas id="myImage" height="256" width="256"></canvas>
+
+	<script type="text/javascript">
+		function transformData(data) {
+			new_data = []
+			x = data['x']
+			y = data['y']
+			for (var i = 0; i < x.length; i++) {
+				new_data.push({x: x[i], y: y[i], r: 5})
+			}
+			return new_data
+		}
+
+		window.onload = function() {
+			var chartCanvas = document.getElementById("myChart")
+			var ctx = chartCanvas.getContext('2d');
+			window.myChart = new Chart(ctx, {
+			    type: 'bubble',
+			    data: {
+			        datasets: [{
+			        	label: "picassos",
+			            data: transformData(data)
+			        }]
+			    }
+			});
+
+			chartCanvas.onclick = function(evt){
+				var img_ctx = document.getElementById("myImage").getContext('2d');
+		    	var activePoint = myChart.getElementAtEvent(evt);
+		    	// => activePoint is a point on the canvas that is at the same position as the click event.
+		    	filename = data['ids'][activePoint[0]._index] + '.jpg'
+		    	img_object = new Image();
+		    	img_object.onload = function(){
+		    		console.log("img loaded")
+		    		img_ctx.drawImage(img_object, 0, 0, 256, 256);
+		    	}
+		    	img_object.src = './picasso/' + filename
+			};
+		}
+	</script>
+</body>
 
 </html>
