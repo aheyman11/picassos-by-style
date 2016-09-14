@@ -23,20 +23,21 @@
 	<div class="container">
         <canvas id="myChart"></canvas>
     </div>
+
 	<canvas id="myImage" ></canvas>   
 
 	<script type="text/javascript">
 		var min_year = 0
 		var max_year = 0
-      var min_x = 0
-      var min_y = 0
-      var max_x = 0
-      var max_y = 0
+    	var min_x = 0
+     	var min_y = 0
+        var max_x = 0
+        var max_y = 0
 		var colormap = hot
 		var num_colors = colormap.length / 3
-      var all_data = null 
-      var all_ids = null
-      var thumbnailHeight = 256
+        var all_data = null 
+        var all_ids = null
+        var thumbnailHeight = 256
 
 		function transformData(data) {
 			min_year = Math.min.apply(null, data['years'])
@@ -47,19 +48,19 @@
 			max_y = Math.max.apply(null, data['y'])         
 			all_data = []
 			all_ids = []
-			for (var i = min_year; i <= max_year; i++) {
+			for (var i = min_year; i <= max_year; i+=10) {
 				color_index = Math.floor((i - min_year) * ((num_colors - 1) / (max_year - min_year)))
 				r = Math.floor(colormap[3*color_index] * 255)
 				g = Math.floor(colormap[3*color_index + 1] * 255)
 				b = Math.floor(colormap[3*color_index + 2] * 255)
 				all_data.push({label: i, data: [], backgroundColor: 'rgba(' + r + ',' + g + ',' + b + ',64)'})
-            all_ids.push([])
+            	all_ids.push([])
 			}
 			x = data['x']
 			y = data['y']
 			years = data['years']
 			for (var i = 0; i < data['x'].length; i++) {
-            var idx = years[i] - min_year
+            	var idx = Math.floor((years[i] - min_year)/10)
 				all_data[idx].data.push({x: x[i], y: y[i], r: 5})
 				all_ids[idx].push(data['ids'][i])
 			}
@@ -68,7 +69,7 @@
 		window.onload = function() {
 			var chartCanvas = document.getElementById("myChart")
 			var ctx = chartCanvas.getContext('2d');
-         transformData(data)
+         	transformData(data)
 
 			window.myChart = new Chart(ctx, {
 			    type: 'bubble',
@@ -79,19 +80,19 @@
 			    	scales: {
             			xAxes: [{
                				ticks: { display: false,
-                           min: min_x,
-                           max: max_x}
+                        	min: min_x,
+                        	max: max_x}
             			}],
             			yAxes: [{
                				ticks: { display: false,
-                           min: min_y,
-                           max: max_x}
+                           	min: min_y,
+                           	max: max_x}
                            
             			}]
         			},
         			legend: {
         				display: true,
-                  position: 'bottom'
+                  		position: 'bottom'
         			}
 			    }
 			});
@@ -99,21 +100,21 @@
 			chartCanvas.onclick = function(evt){
 				var img_ctx = document.getElementById("myImage").getContext('2d');
 		    	var activePoint = myChart.getElementAtEvent(evt);
-            if (activePoint.length === 0) return;
+            	if (activePoint.length === 0) return;
 		    	// => activePoint is a point on the canvas that is at the same position as the click event.
 
-            var canvas = document.getElementById("myImage");
-            
-            var datasetIdx = activePoint[0]._datasetIndex;
-            var paintingIdx = activePoint[0]._index;
+	            var canvas = document.getElementById("myImage");
+	            
+	            var datasetIdx = activePoint[0]._datasetIndex;
+	            var paintingIdx = activePoint[0]._index;
 		    	filename = all_ids[datasetIdx][paintingIdx] + '.jpg'
 		    	img_object = new Image();
 		    	img_object.onload = function(){
-               canvas.height = thumbnailHeight;                
-               canvas.width = thumbnailHeight*(img_object.width/img_object.height);
-               canvas.style.left = window.innerWidth - canvas.width - 10;
+               		canvas.height = thumbnailHeight;                
+               		canvas.width = thumbnailHeight*(img_object.width/img_object.height);
+               		canvas.style.left = window.innerWidth - canvas.width - 10;
 		    		//console.log("img loaded "+ canvas.width+" "+ canvas.height)
-		    		img_ctx.drawImage(img_object, 0, 0, canvas.width, canvas.height);       
+		    		img_ctx.drawImage(img_object, 0, 0, canvas.width, canvas.height);
 		    	}
 		    	img_object.src = './picasso/' + filename
 			};
