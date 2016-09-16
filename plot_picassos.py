@@ -28,7 +28,7 @@ area = np.ones(N)*50
 subfig, ax_list = plt.subplots(1,2)
 
 pid = subfig.canvas.mpl_connect('pick_event', onpick)
-scatter = ax_list[0].scatter(x, y, s=area, c=years, alpha=0.5, picker=True)
+scatter = ax_list[0].scatter(x, y, s=area, c=years, cmap="hot", alpha=0.5, picker=True)
 
 subfig.subplots_adjust(left=0.25)
 cbar_ax = subfig.add_axes([0.05, 0.15, 0.05, 0.7])
